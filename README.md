@@ -11,6 +11,9 @@ From these submissions, a handful will be selected to enter the next part of the
 
 There are £400 in prizes to be won so get coding!
 
+Make sure to register yourself as particpating via this link! (You must be a current student at the University of Warwick to participate):
+[forms.gle/veKd9nQBYFG7yAGq6](https://forms.gle/veKd9nQBYFG7yAGq6)
+
 ---
 
 ## File Structure
