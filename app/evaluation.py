@@ -221,23 +221,62 @@ def evaluation_function(board_pieces, board_occupancy, side_to_move):
     score = 0
 
 
+    def lsb_index(bb):
+        idx = 0
+        while (bb & 1) == 0:
+            bb >>= 1
+            idx += 1
+        return idx
+    
+    
     # Evaluate white pieces (indices 0-5)
     for piece_type in range(6):
         # gets the bit board for the current piece type
         bitboard = board_pieces[piece_type]
-        # Loops through every bit in the bitboard
+        # Loops until the value stored in bitboard is 0, meaning there are no more pieces of that type to evaluate
         while bitboard:
             # Get the least significant bit position by AND the bitboard with its negation, finding its position using bit_length, and adjusting for 0-indexing.
-            sq = (bitboard & -bitboard).bit_length() - 1
+            #sq = (bitboard & -bitboard).bit_length() - 1
+            lsb = bitboard & -bitboard
+            sq = lsb_index(lsb)
             mg_white += MG_TABLE[piece_type][sq]
             eg_white += EG_TABLE[piece_type][sq]
             game_phase += GAMEPHASE_INC[piece_type]
             # Clear the least significant bit
             bitboard &= bitboard - 1
+        # Evaluate black pieces (indices 6-11)
+        for piece_type in range(6):
+            bitboard = board_pieces[piece_type + 6]
+            while bitboard:
+                # Get the least significant bit position
+                #sq = (bitboard & -bitboard).bit_length() - 1
+                lsb = bitboard & -bitboard
+                sq = lsb_index(lsb)
+                mg_black += MG_TABLE[piece_type + 6][sq]
+                eg_black += EG_TABLE[piece_type + 6][sq]
+                game_phase += GAMEPHASE_INC[piece_type]
+                # Clear the least significant bit
+                bitboard &= bitboard - 1 
+    # Tapered eval
+    #calculates the midgame and endgame score if the current turn is white
+    if side_to_move == WHITE:
+        mg_score = mg_white - mg_black
+        eg_score = eg_white - eg_black
+    #calculates the midgame and endgame score if the current turn is BLack
+    else:
+        mg_score = mg_black - mg_white
+        eg_score = eg_black - eg_white
+    
+    
+    mg_phase = game_phase
+    if mg_phase > 24:
+        mg_phase = 24
+    eg_phase = 24 - mg_phase
+    
+    return (mg_score * mg_phase + eg_score * eg_phase) // 24
             
             
-            
-            
+    """       
     # Example: Material value counting
     for sq in range(64):
         piece_id = bt.get_piece(board_pieces, sq) # Helper function in `board_tools` (use them)
@@ -267,3 +306,4 @@ def evaluation_function(board_pieces, board_occupancy, side_to_move):
     if side_to_move == BLACK_TO_MOVE:
         return -score
     return score
+    """
